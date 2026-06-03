@@ -1,16 +1,16 @@
-local executor = string.lower(tostring(identifyexecutor()))
-if executor == "xeno" or executor == "solara" then
-    if not getgenv().allowpotatoexecutor then
-        game:GetService("Players").LocalPlayer:Kick("daydreamer probably won't work on your executor ("..executor..") and you were kicked in order to prevent potential bans, as your executor lacks some functions necessary to bypass anticheats.\n    \n to bypass this warning and load daydreamer anyways, add this line of code before the script. it is NOT our fault if you get anticheat banned.\n    \n getgenv().allowpotatoexecutor = true \n(copied to clipboard)\n   ")
-        setclipboard("getgenv().allowpotatoexecutor = true")
-        error("shit executor, hop off " .. executor .. " and get a better one pls")
-    elseif getgenv().allowpotatoexecutor then
-        warn("your executor (" .. executor .. ") is not supported and probably wont work with daydreamer. do NOT report any bugs, they won't be fixed.")
-    end
-end
-
 if not game:IsLoaded() then
     game.Loaded:Wait()
+end
+
+local exec = string.lower(tostring(identifyexecutor()))
+if exec == "xeno" or exec == "solara" then
+    if not getgenv().allowpotatoexecutor then
+        game:GetService("Players").LocalPlayer:Kick("daydreamer doesnt work on "..exec.." and you were kicked in order to prevent potential bans, as your executor lacks some functions necessary to bypass anticheats.\n    \n to bypass this warning and load daydreamer anyways, add this line of code before the script. it is NOT our fault if you get anticheat banned.\n    \n getgenv().allowpotatoexecutor = true \n(copied to clipboard)\n   ")
+        setclipboard("getgenv().allowpotatoexecutor = true")
+        error("incompatible executor (" .. exec .. ")")
+    elseif getgenv().allowpotatoexecutor then
+        warn("your executor (" .. exec .. ") is not supported and probably wont work with daydreamer. do NOT report any bugs, they won't be fixed.")
+    end
 end
 
 local a = game:GetService'Players'
@@ -79,7 +79,7 @@ if e then
         end)
 
         if not k or not j then
-            return false, 'Connection Error'
+            return false, 'network issue'
         end
         if j.code == 'KEY_VALID' then
             saveKey(g)
