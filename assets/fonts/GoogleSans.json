@@ -1,0 +1,17 @@
+{
+    "name": "GoogleSans",
+    "faces": [
+        {
+            "name": "Regular",
+            "assetId": "rbxasset://models/LivePackages/GoogleSansRegular.ttf",
+            "style": "normal",
+            "weight": 400
+        },
+        {
+            "name": "Bold",
+            "assetId": "rbxasset://models/LivePackages/GoogleSansRegular.ttf",
+            "style": "normal",
+            "weight": 700
+        }
+    ]
+}
