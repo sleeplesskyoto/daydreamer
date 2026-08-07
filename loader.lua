@@ -66,9 +66,11 @@ local games = {
     -- iron soul: dungeon (GameId covers lobby/dungeon/endless; PlaceId kept for lobby fallback)
     [9910245722] = {
         script_id = '1a8d82c87bd4c8405eaf98ddcbc89b08',
+        key_link = 'https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
     },
     [117533937949084] = {
         script_id = '1a8d82c87bd4c8405eaf98ddcbc89b08',
+        key_link = 'https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
     },
 }
 
@@ -406,13 +408,36 @@ if game_config then
         submit_corner.CornerRadius = UDim.new(1, 0)
         submit_corner.Parent = submit_button
 
+        local next_order = 4
+        local key_link = type(game_config.key_link) == 'string' and game_config.key_link or nil
+        local direct_button = nil
+
+        -- ISD (and any future game with key_link) can skip Discord and open the ad key page directly.
+        if key_link and #key_link > 0 then
+            direct_button = Instance.new'TextButton'
+            direct_button.LayoutOrder = next_order
+            next_order = next_order + 1
+            direct_button.Size = UDim2.new(0, 90, 0, 22)
+            direct_button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            direct_button.BorderSizePixel = 0
+            direct_button.Text = 'direct link'
+            direct_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            direct_button.TextSize = 12
+            direct_button.Font = ui_font
+            direct_button.Parent = main_frame
+
+            local direct_corner = Instance.new'UICorner'
+            direct_corner.CornerRadius = UDim.new(1, 0)
+            direct_corner.Parent = direct_button
+        end
+
         local discord_button = Instance.new'TextButton'
 
-        discord_button.LayoutOrder = 4
-        discord_button.Size = UDim2.new(0, 160, 0, 22)
+        discord_button.LayoutOrder = next_order
+        discord_button.Size = UDim2.new(0, key_link and 100 or 160, 0, 22)
         discord_button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         discord_button.BorderSizePixel = 0
-        discord_button.Text = 'join discord (for key link)'
+        discord_button.Text = key_link and 'join discord' or 'join discord (for key link)'
         discord_button.TextColor3 = Color3.fromRGB(255, 255, 255)
         discord_button.TextSize = 12
         discord_button.Font = ui_font
@@ -433,7 +458,35 @@ if game_config then
         end
 
         attach_hover(submit_button)
+        if direct_button then attach_hover(direct_button) end
         attach_hover(discord_button)
+
+        local function copy_url(button, url)
+            if type(setclipboard) == 'function' then
+                pcall(setclipboard, url)
+
+                local original_text = button.Text
+
+                button.Text = 'copied to clipboard'
+
+                task.delay(1.5, function()
+                    if button.Parent then
+                        button.Text = original_text
+                    end
+                end)
+            else
+                local original_text = button.Text
+
+                button.Text = 'copied to box'
+                key_input.Text = url
+
+                task.delay(1.5, function()
+                    if button.Parent then
+                        button.Text = original_text
+                    end
+                end)
+            end
+        end
 
         local is_submitting = false
 
@@ -465,29 +518,13 @@ if game_config then
                 key_input.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
             end
         end)
+        if direct_button then
+            direct_button.MouseButton1Click:Connect(function()
+                copy_url(direct_button, key_link)
+            end)
+        end
         discord_button.MouseButton1Click:Connect(function()
-            local discord_url = 'https://discord.gg/vrvNMmgZ4d'
-
-            if type(setclipboard) == 'function' then
-                pcall(setclipboard, discord_url)
-
-                local original_text = discord_button.Text
-
-                discord_button.Text = 'copied to clipboard'
-
-                task.delay(1.5, function()
-                    discord_button.Text = original_text
-                end)
-            else
-                local original_text = discord_button.Text
-
-                discord_button.Text = 'copied to box'
-                key_input.Text = discord_url
-
-                task.delay(1.5, function()
-                    discord_button.Text = original_text
-                end)
-            end
+            copy_url(discord_button, 'https://discord.gg/vrvNMmgZ4d')
         end)
     end
 
