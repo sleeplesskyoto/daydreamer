@@ -30,31 +30,34 @@ while current_game_id == 0 do
     current_game_id = game.GameId
 end
 
+-- Production Luarmor project: one multi-game loader that routes by GameId internally.
+-- Per-game script_id entries were never what the live loader executed before; using them
+-- via library.load_script() made Rivals pull the wrong project (ISD).
+local LUARMOR_SCRIPT_ID = '1a8d82c87bd4c8405eaf98ddcbc89b08'
+local LUARMOR_LOADER_URL = 'https://api.luarmor.net/files/v4/loaders/' .. LUARMOR_SCRIPT_ID .. '.lua'
+
 local games = {
     -- sailorpiece
-    [9186719164] = {
-        script_id = 'f4ed3e2c509c1afa907a0f0545ca3b18',
-    },
+    [9186719164] = true,
 
     -- sell lemons
-    [7395930870] = {
-        script_id = 'd92c078507b9006e9f194943f5fee191',
-    },
+    [7395930870] = true,
 
     -- noob incremental
-    [9965411707] = {
-        script_id = '9aa013ea312ff05589f1050b7c1dbf52',
-    },
+    [9965411707] = true,
+
+    -- paint an album
+    [10039338037] = true,
+
+    -- jules rng
+    [9272693470] = true,
 
     -- rivals
-    [6035872082] = {
-        script_id = '5c0fa57251c165aa484cab27a52aa424',
-    },
+    [6035872082] = true,
 
-    -- iron soul: dungeon (same validate/save/expire path as rivals)
-    [9910245722] = {
-        script_id = 'ed269f18e29271b20906a3be3053ed6c',
-    },
+    -- iron soul: dungeon (GameId covers lobby/dungeon/endless; PlaceId kept for lobby fallback)
+    [9910245722] = true,
+    [117533937949084] = true,
 }
 
 local game_config = games[current_game_id] or games[game.PlaceId]
@@ -111,7 +114,7 @@ if game_config then
     -- returns is_valid, reason, keep_cached_key
     local function check_key(api_lib, key)
         if type(api_lib.check_key) ~= 'function' then
-            -- older library build without the endpoint, let load_script decide
+            -- older library build without the endpoint, let the project loader decide
             return true
         end
 
@@ -137,7 +140,7 @@ if game_config then
     end
 
     local function run_loader(key)
-        -- Set these before either Luarmor entry path; project loaders read script_key from the env.
+        -- Project loaders read script_key from the env.
         _G.dd_key = key
         getgenv().dd_key = key
         _G.script_key = key
@@ -151,7 +154,7 @@ if game_config then
             return false, 'api load error'
         end
 
-        api_lib.script_id = game_config.script_id
+        api_lib.script_id = LUARMOR_SCRIPT_ID
 
         local is_valid, reason, keep_cached = check_key(api_lib, key)
 
@@ -170,15 +173,15 @@ if game_config then
             save_key(key)
         end
 
-        task.spawn(function()
-            local load_success, load_error = pcall(function()
-                api_lib.load_script()
-            end)
-
-            if not load_success then
-                warn('loader failed for some reason: ' .. tostring(load_error))
-            end
+        -- Load the multi-game project loader (same URL production used before), not
+        -- library.load_script() with a per-game script_id — that routed Rivals into ISD.
+        local load_success, load_error = pcall(function()
+            loadstring(game:HttpGet(LUARMOR_LOADER_URL), '@daydreamer.loader')()
         end)
+
+        if not load_success then
+            return false, 'api load error: ' .. tostring(load_error)
+        end
 
         return true
     end
