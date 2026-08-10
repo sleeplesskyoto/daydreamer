@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://use.daydreamer.wtf"))()
+loadstring(game:HttpGet("https://use.daydreamer.wtf"))();
