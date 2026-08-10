@@ -1,554 +1,554 @@
-if not game:IsLoaded() then
-    game.Loaded:Wait()
+if not game:IsLoaded()then
+game.Loaded:Wait()
 end
 
-local exec = string.lower(tostring(identifyexecutor()))
-if exec == "xeno" or exec == "solara" then
-    if not getgenv().allowpotatoexecutor then
-        game:GetService("Players").LocalPlayer:Kick("daydreamer doesnt work on "..exec.." and you were kicked in order to prevent potential bans, as your executor lacks some functions necessary to bypass anticheats.\n    \n to bypass this warning and load daydreamer anyways, add this line of code before the script. it is NOT our fault if you get anticheat banned.\n    \n getgenv().allowpotatoexecutor = true \n(copied to clipboard)\n   ")
-        setclipboard("getgenv().allowpotatoexecutor = true")
-        error("incompatible executor (" .. exec .. ")")
-    elseif getgenv().allowpotatoexecutor then
-        warn("your executor (" .. exec .. ") is not supported and probably wont work with daydreamer. do NOT report any bugs, they won't be fixed.")
-    end
+local a=string.lower(tostring(identifyexecutor()))
+if a=="xeno"or a=="solara"then
+if not getgenv().allowpotatoexecutor then
+game:GetService"Players".LocalPlayer:Kick("daydreamer doesnt work on "..a.." and you were kicked in order to prevent potential bans, as your executor lacks some functions necessary to bypass anticheats.\n    \n to bypass this warning and load daydreamer anyways, add this line of code before the script. it is NOT our fault if you get anticheat banned.\n    \n getgenv().allowpotatoexecutor = true \n(copied to clipboard)\n   ")
+setclipboard"getgenv().allowpotatoexecutor = true"
+error("incompatible executor ("..a..")")
+elseif getgenv().allowpotatoexecutor then
+warn("your executor ("..a..") is not supported and probably wont work with daydreamer. do NOT report any bugs, they won't be fixed.")
+end
 end
 
-local ps = cloneref(game:GetService'Players')
-local lp = ps.LocalPlayer
+local b=cloneref(game:GetService'Players')
+local c=b.LocalPlayer
 
-while not lp do
-    task.wait()
+while not c do
+task.wait()
 
-    lp = ps.LocalPlayer
+c=b.LocalPlayer
 end
 
-local current_game_id = game.GameId
+local d=game.GameId
 
-while current_game_id == 0 do
-    task.wait()
+while d==0 do
+task.wait()
 
-    current_game_id = game.GameId
+d=game.GameId
 end
 
--- One Luarmor project per game (from the daydreamer dashboard). Do NOT share a single
--- loader URL across games — 1a8d82c8 is Iron Soul Dungeon, not a universal hub.
-local games = {
-    -- sailorpiece
-    [9186719164] = {
-        script_id = 'f4ed3e2c509c1afa907a0f0545ca3b18',
-    },
 
-    -- sell lemons
-    [7395930870] = {
-        script_id = 'd92c078507b9006e9f194943f5fee191',
-    },
 
-    -- noob incremental
-    [9965411707] = {
-        script_id = '9aa013ea312ff05589f1050b7c1dbf52',
-    },
+local e={
 
-    -- paint an album
-    [10039338037] = {
-        script_id = '8dcaeb073a1d775ba880415322aec8c4',
-    },
+[9186719164]={
+script_id='f4ed3e2c509c1afa907a0f0545ca3b18',
+},
 
-    -- jules rng
-    [9272693470] = {
-        script_id = 'c153f998000eeeaec6fa26f3dff8bcdb',
-    },
 
-    -- rivals
-    [6035872082] = {
-        script_id = '5c0fa57251c165aa484cab27a52aa424',
-    },
+[7395930870]={
+script_id='d92c078507b9006e9f194943f5fee191',
+},
 
-    -- iron soul: dungeon (GameId covers lobby/dungeon/endless; PlaceId kept for lobby fallback)
-    [9910245722] = {
-        script_id = '1a8d82c87bd4c8405eaf98ddcbc89b08',
-        key_link = 'https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
-    },
-    [117533937949084] = {
-        script_id = '1a8d82c87bd4c8405eaf98ddcbc89b08',
-        key_link = 'https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
-    },
+
+[9965411707]={
+script_id='9aa013ea312ff05589f1050b7c1dbf52',
+},
+
+
+[10039338037]={
+script_id='8dcaeb073a1d775ba880415322aec8c4',
+},
+
+
+[9272693470]={
+script_id='c153f998000eeeaec6fa26f3dff8bcdb',
+},
+
+
+[6035872082]={
+script_id='5c0fa57251c165aa484cab27a52aa424',
+},
+
+
+[9910245722]={
+script_id='1a8d82c87bd4c8405eaf98ddcbc89b08',
+key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
+},
+[117533937949084]={
+script_id='1a8d82c87bd4c8405eaf98ddcbc89b08',
+key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
+},
 }
 
-local game_config = games[current_game_id] or games[game.PlaceId]
-
-if game_config then
-    local key_file = 'key.daydreamer'
-    local script_id = game_config.script_id
-    local loader_url = 'https://api.luarmor.net/files/v4/loaders/' .. script_id .. '.lua'
-
-    local function save_key(key)
-        if type(writefile) == 'function' then
-            pcall(writefile, key_file, key)
-        end
-    end
-    local function clear_key()
-        if type(delfile) == 'function' then
-            pcall(delfile, key_file)
-        elseif type(writefile) == 'function' then
-            pcall(writefile, key_file, '')
-        end
-    end
-    local function load_key()
-        if type(isfile) == 'function' and isfile(key_file) and type(readfile) == 'function' then
-            local success, key_content = pcall(readfile, key_file)
-
-            if success and type(key_content) == 'string' then
-                key_content = key_content:gsub('%s+', '')
-
-                if #key_content > 0 then
-                    return key_content
-                end
-            end
-        end
-
-        return nil
-    end
-    local function clear_env_key()
-        _G.dd_key = nil
-        _G.script_key = nil
-
-        pcall(function()
-            getgenv().dd_key = nil
-            getgenv().script_key = nil
-        end)
-    end
-
-    -- luarmor codes that mean this specific key is dead, so the cached file has to go
-    local dead_key_codes = {
-        KEY_EXPIRED = 'key expired, get a new one',
-        KEY_BANNED = 'key is blacklisted',
-        KEY_HWID_LOCKED = 'key locked to another hwid',
-        KEY_INCORRECT = 'key doesnt exist',
-        KEY_INVALID = 'bad key format',
-    }
-
-    -- returns is_valid, reason, keep_cached_key
-    local function check_key(api_lib, key)
-        if type(api_lib.check_key) ~= 'function' then
-            -- older library build without the endpoint, let the project loader decide
-            return true
-        end
-
-        local check_success, status = pcall(api_lib.check_key, key)
-
-        if not check_success or type(status) ~= 'table' or type(status.code) ~= 'string' then
-            -- api unreachable or shape changed, dont throw away a key over it
-            return true
-        end
-
-        if status.code == 'KEY_VALID' then
-            return true
-        end
-
-        local dead_reason = dead_key_codes[status.code]
-
-        if dead_reason then
-            return false, dead_reason, false
-        end
-
-        -- SCRIPT_ID_*, INVALID_EXECUTOR, SECURITY_ERROR, TIME_ERROR, UNKNOWN_ERROR: not the keys fault
-        return false, string.lower(tostring(status.message or status.code)), true
-    end
-
-    local function run_loader(key)
-        -- Project loaders read script_key from the env.
-        _G.dd_key = key
-        getgenv().dd_key = key
-        _G.script_key = key
-        getgenv().script_key = key
-
-        local api_success, api_lib = pcall(function()
-            return loadstring(game:HttpGet'https://sdkapi-public.luarmor.net/library.lua', '@daydreamer.thread')()
-        end)
-
-        if not api_success or not api_lib then
-            return false, 'api load error'
-        end
-
-        api_lib.script_id = script_id
-
-        local is_valid, reason, keep_cached = check_key(api_lib, key)
-
-        if not is_valid then
-            -- a stale key must not linger in the file or the globals, or the prompt never gets a chance
-            if not keep_cached then
-                clear_key()
-            end
-
-            clear_env_key()
-
-            return false, reason or 'invalid key'
-        end
-
-        if key and #key > 0 then
-            save_key(key)
-        end
-
-        -- Load THIS game's Luarmor project loader, not a shared URL.
-        local load_success, load_error = pcall(function()
-            loadstring(game:HttpGet(loader_url), '@daydreamer.' .. script_id)()
-        end)
-
-        if not load_success then
-            return false, 'api load error: ' .. tostring(load_error)
-        end
-
-        return true
-    end
-    local function get_env_key()
-        local function validate(candidate_key)
-            if typeof(candidate_key) == 'string' and #candidate_key:gsub('%s+', '') > 0 then
-                return candidate_key:gsub('%s+', '')
-            end
-
-            return nil
-        end
-
-        local env_key = _G.script_key or getgenv().script_key
-
-        if validate(env_key) then
-            return validate(env_key)
-        end
-        if typeof(shared) == 'table' and shared.script_key then
-            if validate(shared.script_key) then
-                return validate(shared.script_key)
-            end
-        end
-
-        for env_level = 1, 10 do
-            local env_success, env_table = pcall(getfenv, env_level)
-
-            if env_success and typeof(env_table) == 'table' and env_table.script_key then
-                if validate(env_table.script_key) then
-                    return validate(env_table.script_key)
-                end
-            end
-        end
-
-        local fenv_success, fenv_key = pcall(function()
-            return key
-        end)
-
-        if fenv_success and validate(fenv_key) then
-            return validate(fenv_key)
-        end
-
-        env_key = _G.dd_key or getgenv().dd_key
-
-        if validate(env_key) then
-            return validate(env_key)
-        end
-        if typeof(shared) == 'table' and shared.dd_key then
-            if validate(shared.dd_key) then
-                return validate(shared.dd_key)
-            end
-        end
-
-        for env_level = 1, 10 do
-            local env_success, env_table = pcall(getfenv, env_level)
-
-            if env_success and typeof(env_table) == 'table' and env_table.dd_key then
-                if validate(env_table.dd_key) then
-                    return validate(env_table.dd_key)
-                end
-            end
-        end
-
-        local final_success, final_key = pcall(function()
-            return key
-        end)
-
-        if final_success and validate(final_key) then
-            return validate(final_key)
-        end
-
-        return nil
-    end
-
-
-    local function prompt_key(initial_message)
-        local ui_font = (pcall(function()
-            return Enum.Font.Inter
-        end) and Enum.Font.Inter or Enum.Font.Gotham)
-        local ui_parent = type(gethui) == 'function' and gethui() or game:GetService('CoreGui')
-
-        -- re-running the loader should replace the previous prompt, not stack a second one
-        local genv = (getgenv and getgenv()) or _G
-        if genv.dd_loader_prompt_gui then
-            pcall(function() genv.dd_loader_prompt_gui:Destroy() end)
-        end
-
-        local screen_gui = Instance.new('ScreenGui', ui_parent)
-        genv.dd_loader_prompt_gui = screen_gui
-
-        screen_gui.Name = 'daydreamer loader (if ur seeing this dont skid my ui pls) @ [' .. os.time() .. ']'
-        screen_gui.ResetOnSpawn = false
-
-        local main_frame = Instance.new'Frame'
-
-        main_frame.AnchorPoint = Vector2.new(0.5, 0.5)
-        main_frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-        main_frame.Size = UDim2.new(0, 0, 0, 40)
-        main_frame.AutomaticSize = Enum.AutomaticSize.X
-        main_frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        main_frame.BorderSizePixel = 0
-        main_frame.Active = true
-        main_frame.Parent = screen_gui
-
-        local frame_corner = Instance.new'UICorner'
-
-        frame_corner.CornerRadius = UDim.new(1, 0)
-        frame_corner.Parent = main_frame
-
-        local layout = Instance.new'UIListLayout'
-
-        layout.FillDirection = Enum.FillDirection.Horizontal
-        layout.VerticalAlignment = Enum.VerticalAlignment.Center
-        layout.SortOrder = Enum.SortOrder.LayoutOrder
-        layout.Padding = UDim.new(0, 8)
-        layout.Parent = main_frame
-
-        local padding = Instance.new'UIPadding'
-
-        padding.PaddingLeft = UDim.new(0, 18)
-        padding.PaddingRight = UDim.new(0, 8)
-        padding.Parent = main_frame
-
-        local input_service, is_dragging, drag_input, drag_start_pos, drag_start_frame_pos = (cloneref(game:GetService'UserInputService'))
-
-        main_frame.InputBegan:Connect(function(input_obj)
-            if input_obj.UserInputType == Enum.UserInputType.MouseButton1 or input_obj.UserInputType == Enum.UserInputType.Touch then
-                is_dragging = true
-                drag_start_pos = input_obj.Position
-                drag_start_frame_pos = main_frame.Position
-
-                input_obj.Changed:Connect(function()
-                    if input_obj.UserInputState == Enum.UserInputState.End then
-                        is_dragging = false
-                    end
-                end)
-            end
-        end)
-        main_frame.InputChanged:Connect(function(input_obj)
-            if input_obj.UserInputType == Enum.UserInputType.MouseMovement or input_obj.UserInputType == Enum.UserInputType.Touch then
-                drag_input = input_obj
-            end
-        end)
-        input_service.InputChanged:Connect(function(input_obj)
-            if input_obj == drag_input and is_dragging then
-                local drag_offset = input_obj.Position - drag_start_pos
-
-                main_frame.Position = UDim2.new(drag_start_frame_pos.X.Scale, drag_start_frame_pos.X.Offset + drag_offset.X, drag_start_frame_pos.Y.Scale, drag_start_frame_pos.Y.Offset + drag_offset.Y)
-            end
-        end)
-
-        local title_label = Instance.new'TextLabel'
-
-        title_label.LayoutOrder = 1
-        title_label.Size = UDim2.new(0, 0, 1, 0)
-        title_label.AutomaticSize = Enum.AutomaticSize.X
-        title_label.BackgroundTransparency = 1
-        title_label.RichText = true
-        title_label.Text = '<font color="#fbeee6">daydreamer.</font>'
-        title_label.TextSize = 14
-        title_label.Font = ui_font
-        title_label.Parent = main_frame
-
-        local key_input = Instance.new'TextBox'
-
-        key_input.LayoutOrder = 2
-        key_input.Size = UDim2.new(0, 140, 0, 26)
-        key_input.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        key_input.BorderSizePixel = 0
-        key_input.Text = ''
-        key_input.PlaceholderText = 'enter key...'
-        key_input.TextColor3 = Color3.fromRGB(255, 255, 255)
-        key_input.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-        key_input.TextSize = 12
-        key_input.Font = ui_font
-        key_input.ClearTextOnFocus = false
-        key_input.ClipsDescendants = true
-        key_input.Parent = main_frame
-
-        local input_corner = Instance.new'UICorner'
-
-        input_corner.CornerRadius = UDim.new(1, 0)
-        input_corner.Parent = key_input
-
-        local input_padding = Instance.new'UIPadding'
-
-        input_padding.PaddingLeft = UDim.new(0, 8)
-        input_padding.PaddingRight = UDim.new(0, 8)
-        input_padding.Parent = key_input
-
-        if initial_message then
-            key_input.PlaceholderText = initial_message
-            key_input.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
-        end
-
-        local submit_button = Instance.new'TextButton'
-
-        submit_button.LayoutOrder = 3
-        submit_button.Size = UDim2.new(0, 90, 0, 22)
-        submit_button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        submit_button.BorderSizePixel = 0
-        submit_button.Text = 'load'
-        submit_button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        submit_button.TextSize = 12
-        submit_button.Font = ui_font
-        submit_button.Parent = main_frame
-
-        local submit_corner = Instance.new'UICorner'
-
-        submit_corner.CornerRadius = UDim.new(1, 0)
-        submit_corner.Parent = submit_button
-
-        local next_order = 4
-        local key_link = type(game_config.key_link) == 'string' and game_config.key_link or nil
-        local direct_button = nil
-
-        -- ISD (and any future game with key_link) can skip Discord and open the ad key page directly.
-        if key_link and #key_link > 0 then
-            direct_button = Instance.new'TextButton'
-            direct_button.LayoutOrder = next_order
-            next_order = next_order + 1
-            direct_button.Size = UDim2.new(0, 90, 0, 22)
-            direct_button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-            direct_button.BorderSizePixel = 0
-            direct_button.Text = 'direct link'
-            direct_button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            direct_button.TextSize = 12
-            direct_button.Font = ui_font
-            direct_button.Parent = main_frame
-
-            local direct_corner = Instance.new'UICorner'
-            direct_corner.CornerRadius = UDim.new(1, 0)
-            direct_corner.Parent = direct_button
-        end
-
-        local discord_button = Instance.new'TextButton'
-
-        discord_button.LayoutOrder = next_order
-        discord_button.Size = UDim2.new(0, key_link and 100 or 160, 0, 22)
-        discord_button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        discord_button.BorderSizePixel = 0
-        discord_button.Text = key_link and 'join discord' or 'join discord (for key link)'
-        discord_button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        discord_button.TextSize = 12
-        discord_button.Font = ui_font
-        discord_button.Parent = main_frame
-
-        local discord_corner = Instance.new'UICorner'
-
-        discord_corner.CornerRadius = UDim.new(1, 0)
-        discord_corner.Parent = discord_button
-
-        local function attach_hover(button)
-            button.MouseEnter:Connect(function()
-                button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            end)
-            button.MouseLeave:Connect(function()
-                button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-            end)
-        end
-
-        attach_hover(submit_button)
-        if direct_button then attach_hover(direct_button) end
-        attach_hover(discord_button)
-
-        local function copy_url(button, url)
-            if type(setclipboard) == 'function' then
-                pcall(setclipboard, url)
-
-                local original_text = button.Text
-
-                button.Text = 'copied to clipboard'
-
-                task.delay(1.5, function()
-                    if button.Parent then
-                        button.Text = original_text
-                    end
-                end)
-            else
-                local original_text = button.Text
-
-                button.Text = 'copied to box'
-                key_input.Text = url
-
-                task.delay(1.5, function()
-                    if button.Parent then
-                        button.Text = original_text
-                    end
-                end)
-            end
-        end
-
-        local is_submitting = false
-
-        submit_button.MouseButton1Click:Connect(function()
-            if is_submitting then
-                return
-            end
-
-            local entered_key = key_input.Text:gsub('%s+', '')
-
-            if entered_key and #entered_key > 0 then
-                is_submitting = true
-                submit_button.Text = 'loading...'
-
-                task.spawn(function()
-                    local loader_success, loader_error = run_loader(entered_key)
-                    if loader_success then
-                        screen_gui:Destroy()
-                    else
-                        is_submitting = false
-                        submit_button.Text = 'load'
-                        key_input.Text = ''
-                        key_input.PlaceholderText = loader_error or 'invalid key'
-                        key_input.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
-                    end
-                end)
-            else
-                key_input.PlaceholderText = 'key cant be empty'
-                key_input.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
-            end
-        end)
-        if direct_button then
-            direct_button.MouseButton1Click:Connect(function()
-                copy_url(direct_button, key_link)
-            end)
-        end
-        discord_button.MouseButton1Click:Connect(function()
-            copy_url(discord_button, 'https://discord.gg/vrvNMmgZ4d')
-        end)
-    end
-
-    -- key from env or cached file will skip this prompt, unless luarmor rejects it
-    local stored_key = get_env_key() or load_key()
-    if stored_key then
-        task.spawn(function()
-            local loader_success, loader_error = run_loader(stored_key)
-            if not loader_success then
-                prompt_key(loader_error)
-            end
-        end)
-    else
-        prompt_key()
-    end
+local f=e[d]or e[game.PlaceId]
+
+if f then
+local g='key.daydreamer'
+local h=f.script_id
+local i='https://api.luarmor.net/files/v4/loaders/'..h..'.lua'
+
+local function save_key(j)
+if type(writefile)=='function'then
+pcall(writefile,g,j)
+end
+end
+local function clear_key()
+if type(delfile)=='function'then
+pcall(delfile,g)
+elseif type(writefile)=='function'then
+pcall(writefile,g,'')
+end
+end
+local function load_key()
+if type(isfile)=='function'and isfile(g)and type(readfile)=='function'then
+local j,k=pcall(readfile,g)
+
+if j and type(k)=='string'then
+k=k:gsub('%s+','')
+
+if#k>0 then
+return k
+end
+end
+end
+
+return nil
+end
+local function clear_env_key()
+_G.dd_key=nil
+_G.script_key=nil
+
+pcall(function()
+getgenv().dd_key=nil
+getgenv().script_key=nil
+end)
+end
+
+
+local j={
+KEY_EXPIRED='key expired, get a new one',
+KEY_BANNED='key is blacklisted',
+KEY_HWID_LOCKED='key locked to another hwid',
+KEY_INCORRECT='key doesnt exist',
+KEY_INVALID='bad key format',
+}
+
+
+local function check_key(k,l)
+if type(k.check_key)~='function'then
+
+return true
+end
+
+local m,n=pcall(k.check_key,l)
+
+if not m or type(n)~='table'or type(n.code)~='string'then
+
+return true
+end
+
+if n.code=='KEY_VALID'then
+return true
+end
+
+local o=j[n.code]
+
+if o then
+return false,o,false
+end
+
+
+return false,string.lower(tostring(n.message or n.code)),true
+end
+
+local function run_loader(k)
+
+_G.dd_key=k
+getgenv().dd_key=k
+_G.script_key=k
+getgenv().script_key=k
+
+local l,m=pcall(function()
+return loadstring(game:HttpGet'https://sdkapi-public.luarmor.net/library.lua','@daydreamer.thread')()
+end)
+
+if not l or not m then
+return false,'api load error'
+end
+
+m.script_id=h
+
+local n,o,p=check_key(m,k)
+
+if not n then
+
+if not p then
+clear_key()
+end
+
+clear_env_key()
+
+return false,o or'invalid key'
+end
+
+if k and#k>0 then
+save_key(k)
+end
+
+
+local q,r=pcall(function()
+loadstring(game:HttpGet(i),'@daydreamer.'..h)()
+end)
+
+if not q then
+return false,'api load error: '..tostring(r)
+end
+
+return true
+end
+local function get_env_key()
+local function validate(k)
+if typeof(k)=='string'and#k:gsub('%s+','')>0 then
+return k:gsub('%s+','')
+end
+
+return nil
+end
+
+local k=_G.script_key or getgenv().script_key
+
+if validate(k)then
+return validate(k)
+end
+if typeof(shared)=='table'and shared.script_key then
+if validate(shared.script_key)then
+return validate(shared.script_key)
+end
+end
+
+for l=1,10 do
+local m,n=pcall(getfenv,l)
+
+if m and typeof(n)=='table'and n.script_key then
+if validate(n.script_key)then
+return validate(n.script_key)
+end
+end
+end
+
+local l,m=pcall(function()
+return key
+end)
+
+if l and validate(m)then
+return validate(m)
+end
+
+k=_G.dd_key or getgenv().dd_key
+
+if validate(k)then
+return validate(k)
+end
+if typeof(shared)=='table'and shared.dd_key then
+if validate(shared.dd_key)then
+return validate(shared.dd_key)
+end
+end
+
+for n=1,10 do
+local o,p=pcall(getfenv,n)
+
+if o and typeof(p)=='table'and p.dd_key then
+if validate(p.dd_key)then
+return validate(p.dd_key)
+end
+end
+end
+
+local n,o=pcall(function()
+return key
+end)
+
+if n and validate(o)then
+return validate(o)
+end
+
+return nil
+end
+
+
+local function prompt_key(k)
+local l=(pcall(function()
+return Enum.Font.Inter
+end)and Enum.Font.Inter or Enum.Font.Gotham)
+local m=type(gethui)=='function'and gethui()or game:GetService'CoreGui'
+
+
+local n=(getgenv and getgenv())or _G
+if n.dd_loader_prompt_gui then
+pcall(function()n.dd_loader_prompt_gui:Destroy()end)
+end
+
+local o=Instance.new('ScreenGui',m)
+n.dd_loader_prompt_gui=o
+
+o.Name='daydreamer loader (if ur seeing this dont skid my ui pls) @ ['..os.time()..']'
+o.ResetOnSpawn=false
+
+local p=Instance.new'Frame'
+
+p.AnchorPoint=Vector2.new(0.5,0.5)
+p.Position=UDim2.new(0.5,0,0.5,0)
+p.Size=UDim2.new(0,0,0,40)
+p.AutomaticSize=Enum.AutomaticSize.X
+p.BackgroundColor3=Color3.fromRGB(0,0,0)
+p.BorderSizePixel=0
+p.Active=true
+p.Parent=o
+
+local q=Instance.new'UICorner'
+
+q.CornerRadius=UDim.new(1,0)
+q.Parent=p
+
+local r=Instance.new'UIListLayout'
+
+r.FillDirection=Enum.FillDirection.Horizontal
+r.VerticalAlignment=Enum.VerticalAlignment.Center
+r.SortOrder=Enum.SortOrder.LayoutOrder
+r.Padding=UDim.new(0,8)
+r.Parent=p
+
+local s=Instance.new'UIPadding'
+
+s.PaddingLeft=UDim.new(0,18)
+s.PaddingRight=UDim.new(0,8)
+s.Parent=p
+
+local t,u,v,w,x=(cloneref(game:GetService'UserInputService'))
+
+p.InputBegan:Connect(function(y)
+if y.UserInputType==Enum.UserInputType.MouseButton1 or y.UserInputType==Enum.UserInputType.Touch then
+u=true
+w=y.Position
+x=p.Position
+
+y.Changed:Connect(function()
+if y.UserInputState==Enum.UserInputState.End then
+u=false
+end
+end)
+end
+end)
+p.InputChanged:Connect(function(y)
+if y.UserInputType==Enum.UserInputType.MouseMovement or y.UserInputType==Enum.UserInputType.Touch then
+v=y
+end
+end)
+t.InputChanged:Connect(function(y)
+if y==v and u then
+local z=y.Position-w
+
+p.Position=UDim2.new(x.X.Scale,x.X.Offset+z.X,x.Y.Scale,x.Y.Offset+z.Y)
+end
+end)
+
+local y=Instance.new'TextLabel'
+
+y.LayoutOrder=1
+y.Size=UDim2.new(0,0,1,0)
+y.AutomaticSize=Enum.AutomaticSize.X
+y.BackgroundTransparency=1
+y.RichText=true
+y.Text='<font color="#fbeee6">daydreamer.</font>'
+y.TextSize=14
+y.Font=l
+y.Parent=p
+
+local z=Instance.new'TextBox'
+
+z.LayoutOrder=2
+z.Size=UDim2.new(0,140,0,26)
+z.BackgroundColor3=Color3.fromRGB(30,30,30)
+z.BorderSizePixel=0
+z.Text=''
+z.PlaceholderText='enter key...'
+z.TextColor3=Color3.fromRGB(255,255,255)
+z.PlaceholderColor3=Color3.fromRGB(150,150,150)
+z.TextSize=12
+z.Font=l
+z.ClearTextOnFocus=false
+z.ClipsDescendants=true
+z.Parent=p
+
+local A=Instance.new'UICorner'
+
+A.CornerRadius=UDim.new(1,0)
+A.Parent=z
+
+local B=Instance.new'UIPadding'
+
+B.PaddingLeft=UDim.new(0,8)
+B.PaddingRight=UDim.new(0,8)
+B.Parent=z
+
+if k then
+z.PlaceholderText=k
+z.PlaceholderColor3=Color3.fromRGB(255,100,100)
+end
+
+local C=Instance.new'TextButton'
+
+C.LayoutOrder=3
+C.Size=UDim2.new(0,90,0,22)
+C.BackgroundColor3=Color3.fromRGB(30,30,30)
+C.BorderSizePixel=0
+C.Text='load'
+C.TextColor3=Color3.fromRGB(255,255,255)
+C.TextSize=12
+C.Font=l
+C.Parent=p
+
+local D=Instance.new'UICorner'
+
+D.CornerRadius=UDim.new(1,0)
+D.Parent=C
+
+local E=4
+local F=type(f.key_link)=='string'and f.key_link or nil
+local G
+
+
+if F and#F>0 then
+G=Instance.new'TextButton'
+G.LayoutOrder=E
+E=E+1
+G.Size=UDim2.new(0,90,0,22)
+G.BackgroundColor3=Color3.fromRGB(30,30,30)
+G.BorderSizePixel=0
+G.Text='direct link'
+G.TextColor3=Color3.fromRGB(255,255,255)
+G.TextSize=12
+G.Font=l
+G.Parent=p
+
+local H=Instance.new'UICorner'
+H.CornerRadius=UDim.new(1,0)
+H.Parent=G
+end
+
+local H=Instance.new'TextButton'
+
+H.LayoutOrder=E
+H.Size=UDim2.new(0,F and 100 or 160,0,22)
+H.BackgroundColor3=Color3.fromRGB(30,30,30)
+H.BorderSizePixel=0
+H.Text=F and'join discord'or'join discord (for key link)'
+H.TextColor3=Color3.fromRGB(255,255,255)
+H.TextSize=12
+H.Font=l
+H.Parent=p
+
+local I=Instance.new'UICorner'
+
+I.CornerRadius=UDim.new(1,0)
+I.Parent=H
+
+local function attach_hover(J)
+J.MouseEnter:Connect(function()
+J.BackgroundColor3=Color3.fromRGB(45,45,45)
+end)
+J.MouseLeave:Connect(function()
+J.BackgroundColor3=Color3.fromRGB(30,30,30)
+end)
+end
+
+attach_hover(C)
+if G then attach_hover(G)end
+attach_hover(H)
+
+local function copy_url(J,K)
+if type(setclipboard)=='function'then
+pcall(setclipboard,K)
+
+local L=J.Text
+
+J.Text='copied to clipboard'
+
+task.delay(1.5,function()
+if J.Parent then
+J.Text=L
+end
+end)
 else
-    local unsupported_message = 'this game is not supported (GameId '
-        .. tostring(current_game_id) .. ', PlaceId ' .. tostring(game.PlaceId) .. ')'
-    warn(unsupported_message)
-    pcall(function()
-        cloneref(game:GetService('StarterGui')):SetCore('SendNotification', {
-            Title = 'daydreamer',
-            Text = 'this game is not supported.',
-            Duration = 8,
-        })
-    end)
+local L=J.Text
+
+J.Text='copied to box'
+z.Text=K
+
+task.delay(1.5,function()
+if J.Parent then
+J.Text=L
+end
+end)
+end
+end
+
+local J=false
+
+C.MouseButton1Click:Connect(function()
+if J then
+return
+end
+
+local K=z.Text:gsub('%s+','')
+
+if K and#K>0 then
+J=true
+C.Text='loading...'
+
+task.spawn(function()
+local L,M=run_loader(K)
+if L then
+o:Destroy()
+else
+J=false
+C.Text='load'
+z.Text=''
+z.PlaceholderText=M or'invalid key'
+z.PlaceholderColor3=Color3.fromRGB(255,100,100)
+end
+end)
+else
+z.PlaceholderText='key cant be empty'
+z.PlaceholderColor3=Color3.fromRGB(255,100,100)
+end
+end)
+if G then
+G.MouseButton1Click:Connect(function()
+copy_url(G,F)
+end)
+end
+H.MouseButton1Click:Connect(function()
+copy_url(H,'https://discord.gg/vrvNMmgZ4d')
+end)
+end
+
+
+local k=get_env_key()or load_key()
+if k then
+task.spawn(function()
+local l,m=run_loader(k)
+if not l then
+prompt_key(m)
+end
+end)
+else
+prompt_key()
+end
+else
+local g='this game is not supported (GameId '
+..tostring(d)..', PlaceId '..tostring(game.PlaceId)..')'
+warn(g)
+pcall(function()
+cloneref(game:GetService'StarterGui'):SetCore('SendNotification',{
+Title='daydreamer',
+Text='this game is not supported.',
+Duration=8,
+})
+end)
 end
