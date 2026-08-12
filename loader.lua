@@ -64,17 +64,35 @@ script_id='5c0fa57251c165aa484cab27a52aa424',
 },
 
 
+-- ISD is currently keyless. Remove key_required=false and uncomment the keyed settings to restore its key prompt.
 [9910245722]={
 script_id='1a8d82c87bd4c8405eaf98ddcbc89b08',
-key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
+key_required=false,
+-- key_required=true,
+-- key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
 },
 [117533937949084]={
 script_id='1a8d82c87bd4c8405eaf98ddcbc89b08',
-key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
+key_required=false,
+-- key_required=true,
+-- key_link='https://ads.luarmor.net/get_key?for=daydreamer_workink-kajGnoUvpPaj',
 },
 }
 
 local f=e[d]or e[game.PlaceId]
+
+if f and f.key_required==false then
+local g,h=pcall(function()
+local i='https://api.luarmor.net/files/v4/loaders/'..f.script_id..'.lua'
+loadstring(game:HttpGet(i),'@daydreamer.'..f.script_id)()
+end)
+
+if not g then
+warn('loader failed for some reason: '..tostring(h))
+end
+
+return
+end
 
 if f then
 local g='key.daydreamer'
